@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  shipper
+  driver
+  admin
+}
+
+enum ShipmentStatus {
+  created
+  assigned
+  en_route
+  delivered
+  problem
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  shipper Shipper?
+  driver  Driver?
+
+  @@map("users")
+}
+
+model Shipper {
+  id           String @id @default(uuid())
+  userId       String @unique @map("user_id")
+  companyName  String @map("company_name")
+  contactPhone String @map("contact_phone")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shipments Shipment[]
+
+  @@map("shippers")
+}
+
+model Driver {
+  id                  String    @id @default(uuid())
+  userId              String    @unique @map("user_id")
+  fullName            String    @map("full_name")
+  phone               String
+  truckType           String?   @map("truck_type")
+  mcNumber            String?   @map("mc_number")
+  dotNumber           String?   @map("dot_number")
+  carrierStatus       String?   @map("carrier_status")
+  insuranceCompany    String?   @map("insurance_company")
+  insurancePolicy     String?   @map("insurance_policy")
+  insuranceExpiration DateTime? @map("insurance_expiration")
+  lastVerificationAt  DateTime? @map("last_verification_at")
+
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shipments             Shipment[]
+  podEvents             PodEvent[]
+  vehicleLocations      VehicleLocation[]
+  carrierVerifications  CarrierVerification[]
+
+  @@map("drivers")
+}
+
+model Shipment {
+  id             String         @id @default(uuid())
+  shipperId      String         @map("shipper_id")
+  driverId       String?        @map("driver_id")
+  pickupAddress  String         @map("pickup_address")
+  dropoffAddress String         @map("dropoff_address")
+  pickupLat      Float          @map("pickup_lat")
+  pickupLng      Float          @map("pickup_lng")
+  dropoffLat     Float          @map("dropoff_lat")
+  dropoffLng     Float          @map("dropoff_lng")
+  status         ShipmentStatus @default(created)
+  price          Float
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  shipper   Shipper    @relation(fields: [shipperId], references: [id], onDelete: Cascade)
+  driver    Driver?    @relation(fields: [driverId], references: [id], onDelete: SetNull)
+  podEvents PodEvent[]
+
+  @@map("shipments")
+}
+
+model PodEvent {
+  id          String   @id @default(uuid())
+  shipmentId  String   @map("shipment_id")
+  driverId    String   @map("driver_id")
+  imageUrl    String   @map("image_url")
+  gpsLat      Float    @map("gps_lat")
+  gpsLng      Float    @map("gps_lng")
+  deviceTime  DateTime @map("device_time")
+  serverTime  DateTime @default(now()) @map("server_time")
+  fraudScore  Int      @map("fraud_score")
+  fraudReason String?  @map("fraud_reason")
+  ocrText     String?  @map("ocr_text")
+  isApproved  Boolean  @map("is_approved")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  driver   Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@map("pod_events")
+}
+
+model VehicleLocation {
+  id         String   @id @default(uuid())
+  driverId   String   @map("driver_id")
+  gpsLat     Float    @map("gps_lat")
+  gpsLng     Float    @map("gps_lng")
+  capturedAt DateTime @default(now()) @map("captured_at")
+
+  driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_locations")
+}
+
+model CarrierVerification {
+  id                      String    @id @default(uuid())
+  driverId                String    @map("driver_id")
+  mcNumber                String?   @map("mc_number")
+  dotNumber               String?   @map("dot_number")
+  authorityStatus         String?   @map("authority_status")
+  insuranceBipdLimit      Float?    @map("insurance_bipd_limit")
+  insuranceCargoLimit     Float?    @map("insurance_cargo_limit")
+  insuranceEffectiveDate  DateTime? @map("insurance_effective_date")
+  insuranceExpirationDate DateTime? @map("insurance_expiration_date")
+  sourceRawJson           Json?     @map("source_raw_json")
+  createdAt               DateTime  @default(now()) @map("created_at")
+
+  driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@map("carrier_verifications")
+}
