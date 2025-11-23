@@ -145,10 +145,11 @@ export class AuthService {
   }
 
   private generateToken(userId: string, email: string, role: string): string {
-    return jwt.sign(
-      { userId, email, role },
-      config.jwtSecret,
-      { expiresIn: config.jwtExpiresIn }
-    );
+    const secret: jwt.Secret = config.jwtSecret;
+    const expiresIn: jwt.SignOptions['expiresIn'] =
+      config.jwtExpiresIn as jwt.SignOptions['expiresIn'];
+    const options: jwt.SignOptions = { expiresIn };
+
+    return jwt.sign({ userId, email, role }, secret, options);
   }
 }
