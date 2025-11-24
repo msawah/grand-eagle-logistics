@@ -20,6 +20,7 @@ export default function UploadPODPage() {
   const [imageUrl, setImageUrl] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [gpsLocation, setGpsLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [gpsStatus, setGpsStatus] = useState<'checking' | 'success' | 'error'>('checking');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -46,21 +47,35 @@ export default function UploadPODPage() {
 
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
+      setGpsStatus('checking');
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setGpsLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
+          setGpsStatus('success');
         },
         (error) => {
           console.error('Geolocation error:', error);
+          setGpsStatus('error');
           setError('Failed to get GPS location. Please enable location services.');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
       );
     } else {
+      setGpsStatus('error');
       setError('Geolocation is not supported by your browser');
     }
+  };
+
+  // Refresh GPS location
+  const refreshGPS = () => {
+    getCurrentLocation();
   };
 
   const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,29 +88,24 @@ export default function UploadPODPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validar tipo de archivo
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file');
       return;
     }
 
-    // Validar tamaño (máx 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError('Image size must be less than 5MB');
       return;
     }
 
-    // Crear preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setImagePreview(e.target?.result as string);
     };
     reader.readAsDataURL(file);
 
-    // En producción, subirías el archivo a S3/Cloudinary/etc
-    // Por ahora, simulamos con una URL
     setError('Note: In production, upload to cloud storage (S3, Cloudinary, etc.)');
-    setImageUrl('https://example.com/pod-image.jpg'); // Placeholder
+    setImageUrl('https://example.com/pod-image.jpg');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,14 +118,35 @@ export default function UploadPODPage() {
         throw new Error('Please provide an image URL or upload an image');
       }
 
-      if (!gpsLocation) {
-        throw new Error('GPS location not available. Please enable location services.');
-      }
+      // CRITICAL: Get fresh GPS location right before submit
+      const freshLocation = await new Promise<{ lat: number; lng: number }>((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Geolocation not supported'));
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+          },
+          (error) => {
+            reject(new Error('Failed to get GPS location'));
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      });
 
       await shipmentsAPI.uploadPOD(shipmentId, {
         imageUrl,
-        gpsLat: gpsLocation.lat,
-        gpsLng: gpsLocation.lng,
+        gpsLat: freshLocation.lat,
+        gpsLng: freshLocation.lng,
         deviceTime: new Date().toISOString(),
       });
 
@@ -194,22 +225,38 @@ export default function UploadPODPage() {
 
         {/* GPS Status */}
         <div className={`mb-6 p-4 rounded-lg border ${
-          gpsLocation
+          gpsStatus === 'success'
             ? 'bg-green-500/10 border-green-500'
+            : gpsStatus === 'error'
+            ? 'bg-red-500/10 border-red-500'
             : 'bg-yellow-500/10 border-yellow-500'
         }`}>
-          <div className="flex items-center space-x-3">
-            <div className="text-2xl">{gpsLocation ? '📍' : '⚠️'}</div>
-            <div>
-              <div className={`font-semibold ${gpsLocation ? 'text-green-400' : 'text-yellow-400'}`}>
-                {gpsLocation ? 'GPS Location Captured' : 'Waiting for GPS...'}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="text-2xl">
+                {gpsStatus === 'success' ? '📍' : gpsStatus === 'error' ? '❌' : '⏳'}
               </div>
-              {gpsLocation && (
-                <div className="text-sm text-slate-400">
-                  Lat: {gpsLocation.lat.toFixed(6)}, Lng: {gpsLocation.lng.toFixed(6)}
+              <div>
+                <div className={`font-semibold ${
+                  gpsStatus === 'success' ? 'text-green-400' : 
+                  gpsStatus === 'error' ? 'text-red-400' : 'text-yellow-400'
+                }`}>
+                  {gpsStatus === 'success' ? 'GPS Location Captured' : 
+                   gpsStatus === 'error' ? 'GPS Error' : 'Checking GPS...'}
                 </div>
-              )}
+                {gpsLocation && (
+                  <div className="text-sm text-slate-400">
+                    Lat: {gpsLocation.lat.toFixed(6)}, Lng: {gpsLocation.lng.toFixed(6)}
+                  </div>
+                )}
+              </div>
             </div>
+            <button
+              onClick={refreshGPS}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition"
+            >
+              Refresh GPS
+            </button>
           </div>
         </div>
 
@@ -232,7 +279,6 @@ export default function UploadPODPage() {
         <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
           <h3 className="text-xl font-bold text-white mb-4">Upload Delivery Photo</h3>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Option 1: Image URL */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Image URL
@@ -248,7 +294,6 @@ export default function UploadPODPage() {
 
             <div className="text-center text-slate-400">OR</div>
 
-            {/* Option 2: File Upload */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Upload Image File
@@ -264,7 +309,6 @@ export default function UploadPODPage() {
               </p>
             </div>
 
-            {/* Image Preview */}
             {imagePreview && (
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -284,26 +328,23 @@ export default function UploadPODPage() {
               </div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
-              disabled={uploading || !imageUrl || !gpsLocation}
+              disabled={uploading || !imageUrl}
               className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition shadow-lg"
             >
-              {uploading ? 'Uploading...' : 'Upload POD'}
+              {uploading ? 'Uploading POD...' : 'Upload POD'}
             </button>
           </form>
 
-          {/* AI Notice */}
           <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500 rounded-lg">
             <div className="flex items-start space-x-3">
-              <div className="text-2xl">🤖</div>
+              <div className="text-2xl">🔒</div>
               <div>
-                <div className="text-blue-400 font-semibold">AI Fraud Detection</div>
+                <div className="text-blue-400 font-semibold">Secure Upload</div>
                 <div className="text-blue-500 text-sm">
-                  Your photo will be automatically analyzed by AI to verify authenticity.
-                  Photos must be clear, show the delivery location, and be taken at the
-                  correct GPS coordinates.
+                  Your delivery photo will be securely stored with GPS coordinates and timestamp.
+                  GPS location is captured at the moment of upload to ensure accuracy.
                 </div>
               </div>
             </div>
