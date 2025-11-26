@@ -5,7 +5,25 @@ const nextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1',
   },
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'grand-eagle-logistics.onrender.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'grand-eagle-logistics.onrender.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.onrender.com',
+      },
+    ],
+  },
+  // Optimize for production
+  swcMinify: true,
+  poweredByHeader: false,
+  compress: true,
+  // Performance optimizations
+  experimental: {
+    optimizeCss: true,
   },
 };
 
