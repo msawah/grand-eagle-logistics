@@ -18,13 +18,8 @@ const nextConfig = {
     ],
   },
   // Optimize for production
-  swcMinify: true,
   poweredByHeader: false,
   compress: true,
-  // Performance optimizations
-  experimental: {
-    optimizeCss: true,
-  },
 };
 
 export default nextConfig;
