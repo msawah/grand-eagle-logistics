@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get('/', authenticate, async (req, res) => {
   try {
-    const wallet = await getWallet(req.user.id);
+    const wallet = await getWallet(req.user!.id);
     res.json(wallet);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -26,7 +26,7 @@ router.post('/add-funds', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Invalid amount' });
     }
 
-    const transaction = await addFunds(req.user.id, amount, description, referenceId);
+    const transaction = await addFunds(req.user!.id, amount, description, referenceId);
     res.json(transaction);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -41,7 +41,7 @@ router.post('/withdraw', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Invalid amount' });
     }
 
-    const transaction = await withdrawFunds(req.user.id, amount);
+    const transaction = await withdrawFunds(req.user!.id, amount);
     res.json(transaction);
   } catch (error: any) {
     res.status(400).json({ error: error.message });

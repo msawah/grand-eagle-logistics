@@ -25,7 +25,7 @@ router.post('/', authenticate, async (req, res) => {
         shipmentId,
         driverId,
         shipperId,
-        reviewerId: req.user.id,
+        reviewerId: req.user!.id,
         rating,
         comment,
       },

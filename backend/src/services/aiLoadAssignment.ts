@@ -142,11 +142,11 @@ export async function autoAssignShipment(shipmentId: string): Promise<boolean> {
       data: {
         driverId: bestMatch.driverId,
         status: 'assigned',
-        aiScoreData: {
+        aiScoreData: JSON.stringify({
           assignmentScore: bestMatch.score,
           reasoning: bestMatch.reasoning,
           distance: bestMatch.distance,
-        },
+        }),
       },
     });
 

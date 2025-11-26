@@ -31,10 +31,20 @@ export async function getWallet(userId: string) {
     });
 
     if (!wallet) {
-      wallet = await createWallet(userId);
+      await createWallet(userId);
+      // Fetch again with transactions
+      wallet = await prisma.wallet.findUnique({
+        where: { userId },
+        include: {
+          transactions: {
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+          },
+        },
+      });
     }
 
-    return wallet;
+    return wallet!
   } catch (error) {
     console.error('Error getting wallet:', error);
     throw error;
