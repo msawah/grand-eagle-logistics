@@ -159,14 +159,18 @@ export default function UltraDriverDashboard() {
 
                   <div className="h-64 bg-[#1a2332] rounded-lg overflow-hidden">
                     <Map
-                      markers={[
+                      locations={[
                         {
-                          position: [stats.activeShipment.pickupLat, stats.activeShipment.pickupLng] as [number, number],
-                          popup: 'Pickup',
+                          lat: stats.activeShipment.pickupLat,
+                          lng: stats.activeShipment.pickupLng,
+                          label: 'Pickup',
+                          type: 'pickup',
                         },
                         {
-                          position: [stats.activeShipment.dropoffLat, stats.activeShipment.dropoffLng] as [number, number],
-                          popup: 'Drop-off',
+                          lat: stats.activeShipment.dropoffLat,
+                          lng: stats.activeShipment.dropoffLng,
+                          label: 'Drop-off',
+                          type: 'dropoff',
                         },
                       ]}
                     />
