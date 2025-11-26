@@ -111,11 +111,10 @@ model Shipper {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shipments     Shipment[]
-  reviews       Review[]       @relation("ShipperReviews")
-  givenReviews  Review[]       @relation("ReviewsByShipper")
-  documents     Document[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shipments Shipment[]
+  reviews   Review[]   @relation("ShipperReviews")
+  documents Document[]
 
   @@map("shippers")
 }
@@ -145,16 +144,15 @@ model Driver {
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime  @updatedAt @map("updated_at")
 
-  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shipments             Shipment[]
-  podEvents             PodEvent[]
-  vehicleLocations      VehicleLocation[]
-  carrierVerifications  CarrierVerification[]
-  reviews               Review[]               @relation("DriverReviews")
-  givenReviews          Review[]               @relation("ReviewsByDriver")
-  penalties             Penalty[]
-  documents             Document[]
-  performanceMetrics    PerformanceMetric[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shipments            Shipment[]
+  podEvents            PodEvent[]
+  vehicleLocations     VehicleLocation[]
+  carrierVerifications CarrierVerification[]
+  reviews              Review[]              @relation("DriverReviews")
+  penalties            Penalty[]
+  documents            Document[]
+  performanceMetrics   PerformanceMetric[]
 
   @@map("drivers")
 }
@@ -322,11 +320,9 @@ model Review {
   isPublic   Boolean  @default(true) @map("is_public")
   createdAt  DateTime @default(now()) @map("created_at")
 
-  shipment       Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
-  driver         Driver?  @relation("DriverReviews", fields: [driverId], references: [id], onDelete: Cascade)
-  shipper        Shipper? @relation("ShipperReviews", fields: [shipperId], references: [id], onDelete: Cascade)
-  reviewerDriver Driver?  @relation("ReviewsByDriver", fields: [reviewerId], references: [id])
-  reviewerShipper Shipper? @relation("ReviewsByShipper", fields: [reviewerId], references: [id])
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  driver   Driver?  @relation("DriverReviews", fields: [driverId], references: [id], onDelete: Cascade)
+  shipper  Shipper? @relation("ShipperReviews", fields: [shipperId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
 }
