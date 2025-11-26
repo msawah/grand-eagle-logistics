@@ -148,9 +148,11 @@ export default function UltraShipperDashboard() {
               <h2 className="text-xl font-bold mb-4">Real-time map</h2>
               <div className="relative h-64 bg-[#1a2332] rounded-lg overflow-hidden">
                 <Map
-                  markers={stats?.shipmentsInTransit?.map((s: any) => ({
-                    position: [s.pickupLat, s.pickupLng] as [number, number],
-                    popup: `Shipment: ${s.id.slice(0, 8)}`,
+                  locations={stats?.shipmentsInTransit?.map((s: any) => ({
+                    lat: s.pickupLat,
+                    lng: s.pickupLng,
+                    label: `Shipment: ${s.id.slice(0, 8)}`,
+                    type: 'pickup' as const,
                   })) || []}
                 />
                 <div className="absolute top-4 right-4 bg-white text-black px-3 py-1 rounded-lg font-bold">
