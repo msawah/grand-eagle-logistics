@@ -1,4 +1,4 @@
-import { prisma } from '../config/db';
+import prisma from '../config/db';
 
 export async function getShipperDashboardStats(shipperId: string) {
   try {
@@ -232,8 +232,8 @@ async function getMonthlyShipmentStats(shipperId: string) {
     },
   });
 
-  const completed = shipments.filter((s) => s.status === 'completed').length;
-  const inProgress = shipments.filter((s) =>
+  const completed = shipments.filter((s: any) => s.status === 'completed').length;
+  const inProgress = shipments.filter((s: any) =>
     ['assigned', 'en_route', 'in_transit', 'picked_up'].includes(s.status)
   ).length;
 
@@ -289,20 +289,20 @@ export async function updatePerformanceMetrics(driverId: string) {
       },
     });
 
-    const onTime = completedShipments.filter((s) => {
+    const onTime = completedShipments.filter((s: any) => {
       if (!s.estimatedDeliveryTime || !s.actualDeliveryTime) return false;
       return s.actualDeliveryTime <= s.estimatedDeliveryTime;
     }).length;
 
-    const totalEarnings = completedShipments.reduce((sum, s) => sum + (s.driverPayout || 0), 0);
-    const totalMiles = completedShipments.reduce((sum, s) => sum + (s.distance || 0), 0);
+    const totalEarnings = completedShipments.reduce((sum: number, s: any) => sum + (s.driverPayout || 0), 0);
+    const totalMiles = completedShipments.reduce((sum: number, s: any) => sum + (s.distance || 0), 0);
 
     const reviews = await prisma.review.findMany({
       where: { driverId },
     });
 
     const avgRating = reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      ? reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length
       : 0;
 
     const penalties = await prisma.penalty.findMany({
@@ -312,7 +312,7 @@ export async function updatePerformanceMetrics(driverId: string) {
       },
     });
 
-    const totalPenalties = penalties.reduce((sum, p) => sum + p.amount, 0);
+    const totalPenalties = penalties.reduce((sum: number, p: any) => sum + p.amount, 0);
 
     const efficiencyScore = completedShipments.length > 0
       ? (onTime / completedShipments.length) * 100

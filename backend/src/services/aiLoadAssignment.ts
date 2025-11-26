@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { config } from '../config/env';
-import { prisma } from '../config/db';
+import prisma from '../config/db';
 
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
 
@@ -63,7 +63,7 @@ export async function findBestDriverForShipment(
       return null;
     }
 
-    const scoredDrivers: DriverScore[] = availableDrivers.map((driver) => {
+    const scoredDrivers: DriverScore[] = availableDrivers.map((driver: any) => {
       const distance = calculateDistance(
         driver.currentLat!,
         driver.currentLng!,

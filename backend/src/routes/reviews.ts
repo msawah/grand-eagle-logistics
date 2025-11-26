@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate } from '../middleware/auth';
-import { prisma } from '../config/db';
+import prisma from '../config/db';
 
 const router = express.Router();
 
@@ -37,7 +37,7 @@ router.post('/', authenticate, async (req, res) => {
       });
 
       const avgRating =
-        driverReviews.reduce((sum, r) => sum + r.rating, 0) / driverReviews.length;
+        driverReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / driverReviews.length;
 
       await prisma.driver.update({
         where: { id: driverId },
@@ -51,7 +51,7 @@ router.post('/', authenticate, async (req, res) => {
       });
 
       const avgRating =
-        shipperReviews.reduce((sum, r) => sum + r.rating, 0) / shipperReviews.length;
+        shipperReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / shipperReviews.length;
 
       await prisma.shipper.update({
         where: { id: shipperId },

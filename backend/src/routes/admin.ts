@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate } from '../middleware/auth';
-import { prisma } from '../config/db';
+import prisma from '../config/db';
 import { applyPenalty } from '../services/walletService';
 import { notifyPenaltyApplied } from '../services/notificationService';
 

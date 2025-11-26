@@ -76,7 +76,7 @@ export class CarrierVerificationService {
         authorityStatus,
         insuranceBipdLimit,
         insuranceCargoLimit,
-        sourceRawJson: fmcsaData as any,
+        sourceRawString: JSON.stringify(fmcsaData),
       },
     });
 
