@@ -3,76 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-}
-
-enum UserRole {
-  shipper
-  driver
-  admin
-  auditor
-}
-
-enum ShipmentStatus {
-  created
-  posted
-  assigned
-  en_route
-  at_pickup
-  picked_up
-  in_transit
-  at_dropoff
-  delivered
-  completed
-  cancelled
-  problem
-}
-
-enum TransactionType {
-  payment
-  refund
-  penalty
-  bonus
-  withdrawal
-  deposit
-  platform_fee
-}
-
-enum TransactionStatus {
-  pending
-  completed
-  failed
-  cancelled
-}
-
-enum NotificationType {
-  shipment_update
-  payment_received
-  penalty_applied
-  new_message
-  system_alert
-  promotion
-}
-
-enum PenaltyType {
-  late_pickup
-  late_delivery
-  no_show
-  damaged_cargo
-  unprofessional_behavior
-  policy_violation
-}
-
-enum DocumentType {
-  bill_of_lading
-  proof_of_delivery
-  insurance
-  license
-  registration
-  contract
-  invoice
-  receipt
 }
 
 model User {
@@ -80,7 +12,7 @@ model User {
   name          String
   email         String    @unique
   passwordHash  String    @map("password_hash")
-  role          UserRole
+  role          String    // shipper, driver, admin, auditor
   isActive      Boolean   @default(true) @map("is_active")
   isVerified    Boolean   @default(false) @map("is_verified")
   phoneNumber   String?   @map("phone_number")
@@ -89,10 +21,10 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  shipper       Shipper?
-  driver        Driver?
-  wallet        Wallet?
-  notifications Notification[]
+  shipper          Shipper?
+  driver           Driver?
+  wallet           Wallet?
+  notifications    Notification[]
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
 
@@ -158,60 +90,60 @@ model Driver {
 }
 
 model Shipment {
-  id                   String         @id @default(uuid())
-  shipperId            String         @map("shipper_id")
-  driverId             String?        @map("driver_id")
-  loadNumber           String?        @unique @map("load_number")
-  pickupAddress        String         @map("pickup_address")
-  dropoffAddress       String         @map("dropoff_address")
-  pickupCity           String?        @map("pickup_city")
-  pickupState          String?        @map("pickup_state")
-  dropoffCity          String?        @map("dropoff_city")
-  dropoffState         String?        @map("dropoff_state")
-  pickupLat            Float          @map("pickup_lat")
-  pickupLng            Float          @map("pickup_lng")
-  dropoffLat           Float          @map("dropoff_lat")
-  dropoffLng           Float          @map("dropoff_lng")
-  status               ShipmentStatus @default(created)
-  cargoType            String?        @map("cargo_type")
-  cargoWeight          Float?         @map("cargo_weight")
-  cargoDescription     String?        @map("cargo_description")
-  specialInstructions  String?        @map("special_instructions")
-  price                Float
-  platformFee          Float          @default(0) @map("platform_fee")
-  driverPayout         Float?         @map("driver_payout")
-  distance             Float?
-  estimatedDuration    Int?           @map("estimated_duration")
-  estimatedPickupTime  DateTime?      @map("estimated_pickup_time")
-  estimatedDeliveryTime DateTime?     @map("estimated_delivery_time")
-  actualPickupTime     DateTime?      @map("actual_pickup_time")
-  actualDeliveryTime   DateTime?      @map("actual_delivery_time")
-  aiRouteData          Json?          @map("ai_route_data")
-  aiScoreData          Json?          @map("ai_score_data")
-  createdAt            DateTime       @default(now()) @map("created_at")
-  updatedAt            DateTime       @updatedAt @map("updated_at")
+  id                    String   @id @default(uuid())
+  shipperId             String   @map("shipper_id")
+  driverId              String?  @map("driver_id")
+  loadNumber            String?  @unique @map("load_number")
+  pickupAddress         String   @map("pickup_address")
+  dropoffAddress        String   @map("dropoff_address")
+  pickupCity            String?  @map("pickup_city")
+  pickupState           String?  @map("pickup_state")
+  dropoffCity           String?  @map("dropoff_city")
+  dropoffState          String?  @map("dropoff_state")
+  pickupLat             Float    @map("pickup_lat")
+  pickupLng             Float    @map("pickup_lng")
+  dropoffLat            Float    @map("dropoff_lat")
+  dropoffLng            Float    @map("dropoff_lng")
+  status                String   @default("created") // created, posted, assigned, en_route, delivered, completed, etc.
+  cargoType             String?  @map("cargo_type")
+  cargoWeight           Float?   @map("cargo_weight")
+  cargoDescription      String?  @map("cargo_description")
+  specialInstructions   String?  @map("special_instructions")
+  price                 Float
+  platformFee           Float    @default(0) @map("platform_fee")
+  driverPayout          Float?   @map("driver_payout")
+  distance              Float?
+  estimatedDuration     Int?     @map("estimated_duration")
+  estimatedPickupTime   DateTime? @map("estimated_pickup_time")
+  estimatedDeliveryTime DateTime? @map("estimated_delivery_time")
+  actualPickupTime      DateTime? @map("actual_pickup_time")
+  actualDeliveryTime    DateTime? @map("actual_delivery_time")
+  aiRouteData           String?  @map("ai_route_data")
+  aiScoreData           String?  @map("ai_score_data")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
 
-  shipper           Shipper             @relation(fields: [shipperId], references: [id], onDelete: Cascade)
-  driver            Driver?             @relation(fields: [driverId], references: [id], onDelete: SetNull)
-  podEvents         PodEvent[]
-  statusHistory     ShipmentStatusHistory[]
-  documents         Document[]
-  reviews           Review[]
-  penalties         Penalty[]
-  analytics         ShipmentAnalytics?
+  shipper   Shipper    @relation(fields: [shipperId], references: [id], onDelete: Cascade)
+  driver    Driver?    @relation(fields: [driverId], references: [id], onDelete: SetNull)
+  podEvents PodEvent[]
+  statusHistory ShipmentStatusHistory[]
+  documents Document[]
+  reviews   Review[]
+  penalties Penalty[]
+  analytics ShipmentAnalytics?
 
   @@map("shipments")
 }
 
 model ShipmentStatusHistory {
-  id         String         @id @default(uuid())
-  shipmentId String         @map("shipment_id")
-  status     ShipmentStatus
+  id         String   @id @default(uuid())
+  shipmentId String   @map("shipment_id")
+  status     String
   location   String?
   notes      String?
   lat        Float?
   lng        Float?
-  createdAt  DateTime       @default(now()) @map("created_at")
+  createdAt  DateTime @default(now()) @map("created_at")
 
   shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 
@@ -230,7 +162,7 @@ model PodEvent {
   fraudScore  Int      @map("fraud_score")
   fraudReason String?  @map("fraud_reason")
   ocrText     String?  @map("ocr_text")
-  aiAnalysis  Json?    @map("ai_analysis")
+  aiAnalysis  String?  @map("ai_analysis")
   isApproved  Boolean  @map("is_approved")
   createdAt   DateTime @default(now()) @map("created_at")
 
@@ -252,7 +184,6 @@ model VehicleLocation {
 
   driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
 
-  @@index([driverId, capturedAt])
   @@map("vehicle_locations")
 }
 
@@ -266,7 +197,7 @@ model CarrierVerification {
   insuranceCargoLimit     Float?    @map("insurance_cargo_limit")
   insuranceEffectiveDate  DateTime? @map("insurance_effective_date")
   insuranceExpirationDate DateTime? @map("insurance_expiration_date")
-  sourceRawJson           Json?     @map("source_raw_json")
+  sourceRawString         String?   @map("source_raw_json")
   createdAt               DateTime  @default(now()) @map("created_at")
 
   driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
@@ -275,15 +206,15 @@ model CarrierVerification {
 }
 
 model Wallet {
-  id             String   @id @default(uuid())
-  userId         String   @unique @map("user_id")
-  balance        Float    @default(0)
-  pendingBalance Float    @default(0) @map("pending_balance")
-  totalEarnings  Float    @default(0) @map("total_earnings")
-  totalSpent     Float    @default(0) @map("total_spent")
-  stripeAccountId String? @map("stripe_account_id")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  balance         Float    @default(0)
+  pendingBalance  Float    @default(0) @map("pending_balance")
+  totalEarnings   Float    @default(0) @map("total_earnings")
+  totalSpent      Float    @default(0) @map("total_spent")
+  stripeAccountId String?  @map("stripe_account_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
@@ -292,17 +223,17 @@ model Wallet {
 }
 
 model Transaction {
-  id              String            @id @default(uuid())
-  walletId        String            @map("wallet_id")
-  type            TransactionType
-  status          TransactionStatus @default(pending)
+  id              String    @id @default(uuid())
+  walletId        String    @map("wallet_id")
+  type            String    // payment, refund, penalty, bonus, withdrawal, deposit, platform_fee
+  status          String    @default("pending") // pending, completed, failed, cancelled
   amount          Float
   description     String?
-  referenceId     String?           @map("reference_id")
-  stripePaymentId String?           @map("stripe_payment_id")
-  metadata        Json?
-  createdAt       DateTime          @default(now()) @map("created_at")
-  completedAt     DateTime?         @map("completed_at")
+  referenceId     String?   @map("reference_id")
+  stripePaymentId String?   @map("stripe_payment_id")
+  metadata        String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  completedAt     DateTime? @map("completed_at")
 
   wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
@@ -328,17 +259,17 @@ model Review {
 }
 
 model Penalty {
-  id          String      @id @default(uuid())
-  shipmentId  String?     @map("shipment_id")
-  driverId    String      @map("driver_id")
-  type        PenaltyType
+  id          String    @id @default(uuid())
+  shipmentId  String?   @map("shipment_id")
+  driverId    String    @map("driver_id")
+  type        String    // late_pickup, late_delivery, no_show, damaged_cargo, etc.
   amount      Float
   reason      String
   description String?
-  isActive    Boolean     @default(true) @map("is_active")
-  isPaid      Boolean     @default(false) @map("is_paid")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  paidAt      DateTime?   @map("paid_at")
+  isActive    Boolean   @default(true) @map("is_active")
+  isPaid      Boolean   @default(false) @map("is_paid")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  paidAt      DateTime? @map("paid_at")
 
   shipment Shipment? @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
   driver   Driver    @relation(fields: [driverId], references: [id], onDelete: Cascade)
@@ -347,20 +278,20 @@ model Penalty {
 }
 
 model Document {
-  id          String       @id @default(uuid())
-  shipmentId  String?      @map("shipment_id")
-  driverId    String?      @map("driver_id")
-  shipperId   String?      @map("shipper_id")
-  type        DocumentType
-  fileName    String       @map("file_name")
-  fileUrl     String       @map("file_url")
-  fileSize    Int?         @map("file_size")
-  mimeType    String?      @map("mime_type")
+  id          String    @id @default(uuid())
+  shipmentId  String?   @map("shipment_id")
+  driverId    String?   @map("driver_id")
+  shipperId   String?   @map("shipper_id")
+  type        String    // bill_of_lading, proof_of_delivery, insurance, license, etc.
+  fileName    String    @map("file_name")
+  fileUrl     String    @map("file_url")
+  fileSize    Int?      @map("file_size")
+  mimeType    String?   @map("mime_type")
   description String?
-  isVerified  Boolean      @default(false) @map("is_verified")
-  aiExtracted Json?        @map("ai_extracted")
-  createdAt   DateTime     @default(now()) @map("created_at")
-  expiresAt   DateTime?    @map("expires_at")
+  isVerified  Boolean   @default(false) @map("is_verified")
+  aiExtracted String?   @map("ai_extracted")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  expiresAt   DateTime? @map("expires_at")
 
   shipment Shipment? @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
   driver   Driver?   @relation(fields: [driverId], references: [id], onDelete: Cascade)
@@ -370,52 +301,50 @@ model Document {
 }
 
 model Notification {
-  id        String           @id @default(uuid())
-  userId    String           @map("user_id")
-  type      NotificationType
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String    // shipment_update, payment_received, penalty_applied, etc.
   title     String
   message   String
-  data      Json?
-  isRead    Boolean          @default(false) @map("is_read")
-  createdAt DateTime         @default(now()) @map("created_at")
-  readAt    DateTime?        @map("read_at")
+  data      String?
+  isRead    Boolean   @default(false) @map("is_read")
+  createdAt DateTime  @default(now()) @map("created_at")
+  readAt    DateTime? @map("read_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, isRead])
   @@map("notifications")
 }
 
 model Message {
-  id         String   @id @default(uuid())
-  senderId   String   @map("sender_id")
-  receiverId String   @map("receiver_id")
+  id         String    @id @default(uuid())
+  senderId   String    @map("sender_id")
+  receiverId String    @map("receiver_id")
   subject    String?
   message    String
-  isRead     Boolean  @default(false) @map("is_read")
-  createdAt  DateTime @default(now()) @map("created_at")
+  isRead     Boolean   @default(false) @map("is_read")
+  createdAt  DateTime  @default(now()) @map("created_at")
   readAt     DateTime? @map("read_at")
 
   sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
   receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
 
-  @@index([senderId, receiverId])
   @@map("messages")
 }
 
 model PerformanceMetric {
-  id                  String   @id @default(uuid())
-  driverId            String   @map("driver_id")
-  date                DateTime @default(now())
-  totalDeliveries     Int      @default(0) @map("total_deliveries")
-  onTimeDeliveries    Int      @default(0) @map("on_time_deliveries")
-  lateDeliveries      Int      @default(0) @map("late_deliveries")
-  averageRating       Float    @default(0) @map("average_rating")
-  totalEarnings       Float    @default(0) @map("total_earnings")
-  totalMiles          Float    @default(0) @map("total_miles")
-  totalPenalties      Float    @default(0) @map("total_penalties")
-  efficiencyScore     Float    @default(0) @map("efficiency_score")
-  customerSatisfaction Float   @default(0) @map("customer_satisfaction")
+  id                   String   @id @default(uuid())
+  driverId             String   @map("driver_id")
+  date                 DateTime @default(now())
+  totalDeliveries      Int      @default(0) @map("total_deliveries")
+  onTimeDeliveries     Int      @default(0) @map("on_time_deliveries")
+  lateDeliveries       Int      @default(0) @map("late_deliveries")
+  averageRating        Float    @default(0) @map("average_rating")
+  totalEarnings        Float    @default(0) @map("total_earnings")
+  totalMiles           Float    @default(0) @map("total_miles")
+  totalPenalties       Float    @default(0) @map("total_penalties")
+  efficiencyScore      Float    @default(0) @map("efficiency_score")
+  customerSatisfaction Float    @default(0) @map("customer_satisfaction")
 
   driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
 
@@ -424,19 +353,19 @@ model PerformanceMetric {
 }
 
 model ShipmentAnalytics {
-  id                    String   @id @default(uuid())
-  shipmentId            String   @unique @map("shipment_id")
-  actualDistance        Float?   @map("actual_distance")
-  fuelEfficiency        Float?   @map("fuel_efficiency")
-  routeDeviation        Float?   @map("route_deviation")
-  stopsCount            Int?     @map("stops_count")
-  idleTimeMinutes       Int?     @map("idle_time_minutes")
-  averageSpeed          Float?   @map("average_speed")
-  weatherImpact         Json?    @map("weather_impact")
-  trafficImpact         Json?    @map("traffic_impact")
-  aiRecommendations     Json?    @map("ai_recommendations")
-  profitabilityScore    Float?   @map("profitability_score")
-  createdAt             DateTime @default(now()) @map("created_at")
+  id                   String   @id @default(uuid())
+  shipmentId           String   @unique @map("shipment_id")
+  actualDistance       Float?   @map("actual_distance")
+  fuelEfficiency       Float?   @map("fuel_efficiency")
+  routeDeviation       Float?   @map("route_deviation")
+  stopsCount           Int?     @map("stops_count")
+  idleTimeMinutes      Int?     @map("idle_time_minutes")
+  averageSpeed         Float?   @map("average_speed")
+  weatherImpact        String?  @map("weather_impact")
+  trafficImpact        String?  @map("traffic_impact")
+  aiRecommendations    String?  @map("ai_recommendations")
+  profitabilityScore   Float?   @map("profitability_score")
+  createdAt            DateTime @default(now()) @map("created_at")
 
   shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 
