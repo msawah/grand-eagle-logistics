@@ -1,0 +1,90 @@
+═══════════════════════════════════════════════════════════
+  🦅 GRAND EAGLE LOGISTICS - COMANDOS EXACTOS
+═══════════════════════════════════════════════════════════
+
+📍 ESTÁS AQUÍ: /home/user/grand-eagle-logistics
+
+══════════════════════════════════════════════════════════
+  ⚡ OPCIÓN 1: AUTOMÁTICO (1 comando)
+══════════════════════════════════════════════════════════
+
+./start.sh
+
+(Espera 30 segundos y abre: http://localhost:3000)
+
+══════════════════════════════════════════════════════════
+  📋 OPCIÓN 2: MANUAL (si el script no funciona)
+══════════════════════════════════════════════════════════
+
+TERMINAL 1 - BACKEND:
+---------------------
+cd /home/user/grand-eagle-logistics/backend
+npm install
+npm run prisma:generate
+npm run prisma:push
+npm run dev
+
+(Deberías ver: "Server running on port 4000")
+
+
+TERMINAL 2 - FRONTEND:
+----------------------
+cd /home/user/grand-eagle-logistics/frontend
+npm install
+npm run dev
+
+(Deberías ver: "Ready on http://localhost:3000")
+
+
+══════════════════════════════════════════════════════════
+  ✅ VERIFICAR
+══════════════════════════════════════════════════════════
+
+1. Backend funcionando:
+   http://localhost:4000/api/v1/health
+
+2. Frontend funcionando:
+   http://localhost:3000
+
+3. Registrar usuario:
+   http://localhost:3000/register
+
+══════════════════════════════════════════════════════════
+  🐛 SI TIENES ERRORES
+══════════════════════════════════════════════════════════
+
+Error: "Cannot connect to database"
+→ Instalar PostgreSQL:
+  Mac: brew install postgresql && brew services start postgresql
+  Ubuntu: sudo apt install postgresql
+→ Crear DB: createdb grand_eagle_db
+
+
+Error: "Port 4000 already in use"
+→ Matar proceso: lsof -ti:4000 | xargs kill -9
+
+
+Error: "Module not found"
+→ cd backend && npm install
+→ cd frontend && npm install
+
+
+Error: "Prisma Client not initialized"
+→ cd backend && npm run prisma:generate
+
+
+══════════════════════════════════════════════════════════
+  📞 ARCHIVOS DE AYUDA
+══════════════════════════════════════════════════════════
+
+EMPEZAR_AQUI.md    ← Instrucciones detalladas
+INICIO_RAPIDO.md   ← Guía paso a paso
+RENDER_SETUP.md    ← Deploy a producción
+TODO_USUARIO.md    ← Guía completa
+
+
+══════════════════════════════════════════════════════════
+
+¡Eso es todo! Cualquier pregunta, avísame.
+
+🦅 Soar High, Deliver Fast!
