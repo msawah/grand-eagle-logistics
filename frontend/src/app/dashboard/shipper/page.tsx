@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { shipmentsAPI, driversAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ShipperDashboard() {
   const { user, logout, loading: authLoading } = useAuth();
@@ -12,15 +13,6 @@ export default function ShipperDashboard() {
   const [drivers, setDrivers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [formData, setFormData] = useState({
-    pickupAddress: '',
-    dropoffAddress: '',
-    pickupLat: '',
-    pickupLng: '',
-    dropoffLat: '',
-    dropoffLng: '',
-    price: '',
-  });
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -47,33 +39,6 @@ export default function ShipperDashboard() {
     }
   };
 
-  const handleCreateShipment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await shipmentsAPI.create({
-        ...formData,
-        pickupLat: parseFloat(formData.pickupLat),
-        pickupLng: parseFloat(formData.pickupLng),
-        dropoffLat: parseFloat(formData.dropoffLat),
-        dropoffLng: parseFloat(formData.dropoffLng),
-        price: parseFloat(formData.price),
-      });
-      setShowCreateForm(false);
-      setFormData({
-        pickupAddress: '',
-        dropoffAddress: '',
-        pickupLat: '',
-        pickupLng: '',
-        dropoffLat: '',
-        dropoffLng: '',
-        price: '',
-      });
-      loadData();
-    } catch (error) {
-      console.error('Error creating shipment:', error);
-    }
-  };
-
   const handleAssignDriver = async (shipmentId: string, driverId: string) => {
     try {
       await shipmentsAPI.assignDriver(shipmentId, driverId);
@@ -85,66 +50,69 @@ export default function ShipperDashboard() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0d1829] flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-[#0d1829] text-white">
       {/* Header */}
-      <nav className="bg-slate-800 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="text-3xl">🦅</div>
-              <div>
-                <h1 className="text-lg font-bold text-white">Grand Eagle Logistics</h1>
-                <p className="text-xs text-slate-400">Shipper Dashboard</p>
-              </div>
+      <header className="bg-[#1a2942] border-b border-[#2d3f5f]">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="text-2xl font-bold flex items-center space-x-3">
+              <span>🦅</span>
+              <span>Grand Eagle Logistics - Shipper</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-slate-300">{user?.name}</span>
+              <Link
+                href="/dashboard/shipper/ultra"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+              >
+                Ultra Dashboard
+              </Link>
+              <span className="text-gray-300">{user?.name}</span>
               <button
                 onClick={logout}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
               >
                 Logout
               </button>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
             <div className="text-3xl mb-2">📦</div>
-            <div className="text-2xl font-bold text-white">{shipments.length}</div>
-            <div className="text-slate-400">Total Shipments</div>
+            <div className="text-2xl font-bold">{shipments.length}</div>
+            <div className="text-gray-400">Total Shipments</div>
           </div>
-          <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
             <div className="text-3xl mb-2">🚛</div>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold">
               {shipments.filter((s) => s.status === 'en_route').length}
             </div>
-            <div className="text-slate-400">In Transit</div>
+            <div className="text-gray-400">In Transit</div>
           </div>
-          <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
             <div className="text-3xl mb-2">✅</div>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold">
               {shipments.filter((s) => s.status === 'delivered').length}
             </div>
-            <div className="text-slate-400">Delivered</div>
+            <div className="text-gray-400">Delivered</div>
           </div>
-          <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
             <div className="text-3xl mb-2">⏳</div>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold">
               {shipments.filter((s) => s.status === 'created').length}
             </div>
-            <div className="text-slate-400">Pending</div>
+            <div className="text-gray-400">Pending</div>
           </div>
         </div>
 
@@ -152,154 +120,44 @@ export default function ShipperDashboard() {
         <div className="mb-6">
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg transition"
           >
             {showCreateForm ? 'Cancel' : '+ Create New Shipment'}
           </button>
         </div>
 
-        {/* Create Form */}
-        {showCreateForm && (
-          <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 mb-6">
-            <h3 className="text-xl font-bold text-white mb-4">Create New Shipment</h3>
-            <form onSubmit={handleCreateShipment} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Pickup Address
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.pickupAddress}
-                    onChange={(e) => setFormData({ ...formData, pickupAddress: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Dropoff Address
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.dropoffAddress}
-                    onChange={(e) => setFormData({ ...formData, dropoffAddress: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Pickup Latitude
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={formData.pickupLat}
-                    onChange={(e) => setFormData({ ...formData, pickupLat: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Pickup Longitude
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={formData.pickupLng}
-                    onChange={(e) => setFormData({ ...formData, pickupLng: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Dropoff Latitude
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={formData.dropoffLat}
-                    onChange={(e) => setFormData({ ...formData, dropoffLat: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Dropoff Longitude
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={formData.dropoffLng}
-                    onChange={(e) => setFormData({ ...formData, dropoffLng: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Price ($)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
-              >
-                Create Shipment
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* Shipments List */}
-        <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-700">
-            <h3 className="text-xl font-bold text-white">My Shipments</h3>
+        {/* My Shipments Table */}
+        <div className="bg-[#1a2942] rounded-lg border border-[#2d3f5f] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#2d3f5f]">
+            <h3 className="text-xl font-bold">My Shipments</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-700">
+              <thead className="bg-[#0d1829]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase">
-                    From → To
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    FROM → TO
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase">
-                    Status
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    STATUS
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase">
-                    Driver
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    DRIVER
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase">
-                    Price
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    PRICE
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase">
-                    Actions
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    ACTIONS
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700">
+              <tbody className="divide-y divide-[#2d3f5f]">
                 {shipments.map((shipment) => (
-                  <tr key={shipment.id} className="hover:bg-slate-700/50">
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                  <tr key={shipment.id} className="hover:bg-[#0d1829]/50">
+                    <td className="px-6 py-4 text-sm">
                       <div>{shipment.pickupAddress}</div>
-                      <div className="text-slate-500">→ {shipment.dropoffAddress}</div>
+                      <div className="text-gray-500">→ {shipment.dropoffAddress}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -310,17 +168,17 @@ export default function ShipperDashboard() {
                             ? 'bg-blue-500/20 text-blue-400'
                             : shipment.status === 'assigned'
                             ? 'bg-yellow-500/20 text-yellow-400'
-                            : 'bg-slate-500/20 text-slate-400'
+                            : 'bg-gray-500/20 text-gray-400'
                         }`}
                       >
                         {shipment.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="px-6 py-4 text-sm">
                       {shipment.driver?.user?.name || (
                         <select
                           onChange={(e) => handleAssignDriver(shipment.id, e.target.value)}
-                          className="px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs"
+                          className="px-2 py-1 bg-[#0d1829] border border-[#2d3f5f] rounded text-white text-xs"
                         >
                           <option value="">Assign Driver</option>
                           {drivers.map((driver) => (
@@ -331,9 +189,7 @@ export default function ShipperDashboard() {
                         </select>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
-                      ${shipment.price.toFixed(2)}
-                    </td>
+                    <td className="px-6 py-4 text-sm">${shipment.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-sm">
                       <button className="text-blue-400 hover:text-blue-300">View Details</button>
                     </td>
