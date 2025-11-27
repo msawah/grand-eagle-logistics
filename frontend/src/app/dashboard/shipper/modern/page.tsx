@@ -19,7 +19,7 @@ const DriversMap = dynamic(
   { ssr: false, loading: () => <div className="h-[400px] bg-slate-800 animate-pulse rounded-2xl"></div> }
 );
 
-export default function ShipperDashboard() {
+export default function ModernShipperDashboard() {
   const { user, logout, loading: authLoading } = useAuth();
   const router = useRouter();
   const [shipments, setShipments] = useState<any[]>([]);
