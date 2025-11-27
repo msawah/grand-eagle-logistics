@@ -4,28 +4,15 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { shipmentsAPI, driversAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import Sidebar from '@/components/dashboard/Sidebar';
-import { StatsGrid } from '@/components/dashboard/StatisticsCard';
-import AIChat from '@/components/dashboard/AIChat';
-import AvailableLoads from '@/components/dashboard/AvailableLoads';
-import ShipmentHistory from '@/components/dashboard/ShipmentHistory';
-import SecurityRoles from '@/components/dashboard/SecurityRoles';
-import { BellIcon, UserCircleIcon } from '@heroicons/react/24/outline';
-
-// Cargar mapa dinámicamente (solo en cliente)
-const DriversMap = dynamic(
-  () => import('@/components/Map').then((mod) => mod.DriversMap),
-  { ssr: false, loading: () => <div className="h-[400px] bg-slate-800 animate-pulse rounded-2xl"></div> }
-);
+import Link from 'next/link';
 
 export default function ShipperDashboard() {
   const { user, logout, loading: authLoading } = useAuth();
   const router = useRouter();
   const [shipments, setShipments] = useState<any[]>([]);
   const [drivers, setDrivers] = useState<any[]>([]);
-  const [driverLocations, setDriverLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -39,15 +26,12 @@ export default function ShipperDashboard() {
 
   const loadData = async () => {
     try {
-      const [shipmentsRes, driversRes, locationsRes] = await Promise.all([
+      const [shipmentsRes, driversRes] = await Promise.all([
         shipmentsAPI.getAll(),
         driversAPI.getAll(),
-        driversAPI.getLocations().catch(() => ({ data: [] })),
       ]);
-
       setShipments(shipmentsRes.data);
       setDrivers(driversRes.data);
-      setDriverLocations(locationsRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -55,135 +39,167 @@ export default function ShipperDashboard() {
     }
   };
 
+  const handleAssignDriver = async (shipmentId: string, driverId: string) => {
+    try {
+      await shipmentsAPI.assignDriver(shipmentId, driverId);
+      loadData();
+    } catch (error) {
+      console.error('Error assigning driver:', error);
+    }
+  };
+
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0d1829] flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
 
-  // Preparar datos para componentes
-  const stats = {
-    totalRevenue: shipments.reduce((sum, s) => sum + s.price, 0),
-    revenueChange: '+14.4%',
-    loadsInTransit: shipments.filter((s) => s.status === 'en_route').length,
-    transitChange: '+2%',
-    totalLoads: shipments.length,
-    deliveredLoads: shipments.filter((s) => s.status === 'delivered').length,
-  };
-
-  const loads = shipments.map((s) => ({
-    id: s.id,
-    loadId: `#${s.id.slice(0, 6)}`,
-    pickup: s.pickupAddress,
-    dropoff: s.dropoffAddress,
-    revenue: s.price,
-    status: s.status === 'created' ? 'posted' : s.status === 'assigned' ? 'assigned' : s.status === 'en_route' ? 'en-route' : 'delivered',
-  }));
-
-  const historyEvents = shipments
-    .slice(0, 4)
-    .map((s) => ({
-      id: s.id,
-      title: s.status === 'delivered' ? 'Lead delivered to Columbus, OH' : s.status === 'assigned' ? 'Driver-John Baker assigned' : s.status === 'en_route' ? 'Picked up shipment in Chicago-IL' : 'New load created',
-      description: `${s.pickupAddress} → ${s.dropoffAddress}`,
-      timestamp: new Date(s.createdAt),
-      type: s.status === 'delivered' ? 'delivered' : s.status === 'assigned' ? 'assigned' : s.status === 'en_route' ? 'pickup' : 'created',
-    })) as any;
-
-  const mappedDrivers = driverLocations
-    .filter((loc) => loc.latitude && loc.longitude)
-    .map((loc) => ({
-      id: loc.driverId,
-      name: loc.driver?.user?.name || 'Driver',
-      lat: loc.latitude,
-      lng: loc.longitude,
-    }));
-
   return (
-    <div className="flex h-screen bg-slate-950 overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-64 flex-shrink-0">
-        <Sidebar role="shipper" userName={user?.name || 'User'} />
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <header className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800 sticky top-0 z-10">
-          <div className="px-8 py-4 flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-              <p className="text-sm text-slate-400">Welcome back, {user?.name}!</p>
+    <div className="min-h-screen bg-[#0d1829] text-white">
+      {/* Header */}
+      <header className="bg-[#1a2942] border-b border-[#2d3f5f]">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="text-2xl font-bold flex items-center space-x-3">
+              <span>🦅</span>
+              <span>Grand Eagle Logistics - Shipper</span>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="relative p-2 text-slate-400 hover:text-white transition">
-                <BellIcon className="h-6 w-6" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+              <Link
+                href="/dashboard/shipper/ultra"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+              >
+                Ultra Dashboard
+              </Link>
+              <span className="text-gray-300">{user?.name}</span>
+              <button
+                onClick={logout}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
+              >
+                Logout
               </button>
-              <div className="flex items-center space-x-3">
-                <UserCircleIcon className="h-10 w-10 text-slate-400" />
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition"
-                >
-                  Logout
-                </button>
-              </div>
             </div>
-          </div>
-        </header>
-
-        {/* Dashboard Grid */}
-        <div className="p-8 space-y-6">
-          {/* Row 1: Map + Stats + AI Chat */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Real-time Map */}
-            <div className="lg:col-span-6">
-              <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-white">Real-time map</h2>
-                  <div className="bg-white px-3 py-1 rounded-full">
-                    <span className="text-sm font-semibold text-slate-900">6h46m</span>
-                  </div>
-                </div>
-                <div className="rounded-xl overflow-hidden">
-                  {mappedDrivers.length > 0 ? (
-                    <DriversMap drivers={mappedDrivers} className="h-[400px]" />
-                  ) : (
-                    <div className="h-[400px] bg-slate-700/30 rounded-xl flex items-center justify-center text-slate-500">
-                      No active drivers with GPS enabled
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Stats + AI Chat */}
-            <div className="lg:col-span-6 space-y-6">
-              {/* Statistics */}
-              <StatsGrid stats={stats} />
-
-              {/* AI Chat */}
-              <div className="h-[300px]">
-                <AIChat />
-              </div>
-            </div>
-          </div>
-
-          {/* Row 2: Available Loads */}
-          <div>
-            <AvailableLoads loads={loads} onLoadClick={(id) => router.push(`/dashboard/shipper/shipments/${id}`)} />
-          </div>
-
-          {/* Row 3: Shipment History + Security & Roles */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ShipmentHistory events={historyEvents} />
-            <SecurityRoles />
           </div>
         </div>
-      </main>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Stats */}
+        <div className="grid md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
+            <div className="text-3xl mb-2">📦</div>
+            <div className="text-2xl font-bold">{shipments.length}</div>
+            <div className="text-gray-400">Total Shipments</div>
+          </div>
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
+            <div className="text-3xl mb-2">🚛</div>
+            <div className="text-2xl font-bold">
+              {shipments.filter((s) => s.status === 'en_route').length}
+            </div>
+            <div className="text-gray-400">In Transit</div>
+          </div>
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
+            <div className="text-3xl mb-2">✅</div>
+            <div className="text-2xl font-bold">
+              {shipments.filter((s) => s.status === 'delivered').length}
+            </div>
+            <div className="text-gray-400">Delivered</div>
+          </div>
+          <div className="bg-[#1a2942] p-6 rounded-lg border border-[#2d3f5f]">
+            <div className="text-3xl mb-2">⏳</div>
+            <div className="text-2xl font-bold">
+              {shipments.filter((s) => s.status === 'created').length}
+            </div>
+            <div className="text-gray-400">Pending</div>
+          </div>
+        </div>
+
+        {/* Create Shipment Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg transition"
+          >
+            {showCreateForm ? 'Cancel' : '+ Create New Shipment'}
+          </button>
+        </div>
+
+        {/* My Shipments Table */}
+        <div className="bg-[#1a2942] rounded-lg border border-[#2d3f5f] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#2d3f5f]">
+            <h3 className="text-xl font-bold">My Shipments</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-[#0d1829]">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    FROM → TO
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    STATUS
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    DRIVER
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    PRICE
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                    ACTIONS
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#2d3f5f]">
+                {shipments.map((shipment) => (
+                  <tr key={shipment.id} className="hover:bg-[#0d1829]/50">
+                    <td className="px-6 py-4 text-sm">
+                      <div>{shipment.pickupAddress}</div>
+                      <div className="text-gray-500">→ {shipment.dropoffAddress}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded ${
+                          shipment.status === 'delivered'
+                            ? 'bg-green-500/20 text-green-400'
+                            : shipment.status === 'en_route'
+                            ? 'bg-blue-500/20 text-blue-400'
+                            : shipment.status === 'assigned'
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-gray-500/20 text-gray-400'
+                        }`}
+                      >
+                        {shipment.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {shipment.driver?.user?.name || (
+                        <select
+                          onChange={(e) => handleAssignDriver(shipment.id, e.target.value)}
+                          className="px-2 py-1 bg-[#0d1829] border border-[#2d3f5f] rounded text-white text-xs"
+                        >
+                          <option value="">Assign Driver</option>
+                          {drivers.map((driver) => (
+                            <option key={driver.id} value={driver.id}>
+                              {driver.user.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">${shipment.price.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-sm">
+                      <button className="text-blue-400 hover:text-blue-300">View Details</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
