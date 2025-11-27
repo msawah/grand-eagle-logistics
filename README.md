@@ -1,36 +1,156 @@
 # 🦅 Grand Eagle Logistics
 
-**Professional Logistics Management Platform**
+<div align="center">
 
-A complete full-stack logistics platform with real-time GPS tracking, AI-powered fraud detection, and carrier verification.
+**Professional AI-Powered Logistics Management Platform**
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
+
+*Sistema completo de gestión logística con IA, tracking en tiempo real, detección de fraude, y verificación de transportistas*
+
+[Características](#-características) • [Arquitectura](#-arquitectura) • [Quick Start](#-quick-start) • [Deploy](#-deployment)
+
+</div>
 
 ---
 
-## 🌟 Features
+## 📸 Dashboard Preview
 
-### Core Functionality
-- ✅ **User Authentication** - JWT-based auth with role-based access control (Shipper, Driver, Admin)
-- 📦 **Shipment Management** - Create, assign, and track shipments
-- 🚛 **Real-Time GPS Tracking** - Live driver location updates
-- 🤖 **AI Fraud Detection** - OpenAI Vision API analyzes POD photos
-- 🔍 **Carrier Verification** - Automatic MC/DOT verification via FMCSA
-- 📸 **Proof of Delivery** - Secure POD upload with GPS validation
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  🦅 Shipper Dashboard                                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  📊 Real-time Map          📈 Statistics         🤖 AI Chat      │
+│  ├─ GPS Tracking           ├─ Total Revenue     ├─ Smart Assist │
+│  ├─ Route Planning         ├─ In Transit        └─ Q&A System   │
+│  └─ Live Updates           └─ Analytics                          │
+│                                                                   │
+│  📦 Available Loads        📜 Shipment History  🔐 Security      │
+│  ├─ Posted                 ├─ Delivered         ├─ Driver        │
+│  ├─ Assigned               ├─ Assigned          ├─ Shipper       │
+│  ├─ En-route               ├─ Picked Up         ├─ Admin         │
+│  └─ Delivered              └─ Created           └─ Auditor       │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### Tech Stack
+---
 
-**Backend:**
+## 🌟 Características
+
+### 🚀 Core Features
+- ✅ **Real-Time GPS Tracking** - Seguimiento en vivo de conductores
+- 🤖 **AI-Powered Features** - Asignación inteligente, detección de fraude, Q&A
+- 📦 **Gestión de Envíos** - Crear, asignar, y rastrear shipments
+- 🔐 **Sistema de Roles** - Shipper, Driver, Admin, Auditor
+- 💰 **Wallet & Payments** - Sistema de billetera integrado
+- 📸 **Proof of Delivery (POD)** - Validación con GPS + AI Vision
+- 🔍 **Carrier Verification** - Verificación automática MC/DOT via FMCSA
+- 📊 **Analytics Dashboard** - Métricas en tiempo real
+- 🗺️ **Route Planning** - Optimización de rutas con IA
+- ⚡ **ETA Prediction** - Predicción de tiempo de llegada
+- 🛡️ **Fraud Detection** - Detección de fraude en POD con OpenAI Vision
+- 📱 **Notificaciones** - Sistema de notificaciones en tiempo real
+
+### 🤖 AI Capabilities
+- **Document Parsing** - Análisis automático de documentos
+- **Load Assignment** - Asignación inteligente de cargas
+- **Route Optimization** - Optimización de rutas
+- **Performance Analysis** - Análisis de rendimiento
+- **Driver Q&A** - Asistente virtual para conductores
+- **Report Generation** - Generación automática de reportes
+
+---
+
+## 🏗️ Arquitectura
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                            FRONTEND                                  │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📊 Shipper Dashboard    🚛 Driver Dashboard    ⚙️  Admin Dashboard │
+│  🗺️  Real-Time Map        💬 AI Chat            📄 Document System  │
+│  🚨 Penalty System       📜 Shipment History    💳 Wallet & Payments│
+│  👤 Driver Profile                                                   │
+│                                                                      │
+│                    Next.js 15 + React 19 + TypeScript               │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+                           │ REST API
+                           │
+┌──────────────────────────┴──────────────────────────────────────────┐
+│                           BACKEND                                    │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  🗄️  PostgreSQL          🧠 LLM Engine         ⚙️  Rules Engine     │
+│  🔒 Data Encryption      🌐 External API       📋 Task Queue        │
+│  📊 Event Logging                                                    │
+│                                                                      │
+│                   Node.js + Express + TypeScript + Prisma           │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+                           │
+┌──────────────────────────┴──────────────────────────────────────────┐
+│                          AI MODEL                                    │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  🧾 Document Parsing     🎯 Load Assignment    🛡️  Fraud Detection  │
+│  🗺️  Route Planning       ⏱️  ETA Prediction     📊 Report Generation│
+│  💬 Driver Q&A           📈 Performance Analysis                     │
+│                                                                      │
+│                          OpenAI GPT-4 Vision                        │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                         INTEGRATIONS                                 │
+├──────────────────────────────────────────────────────────────────────┤
+│  🗺️  Maps API (Google)   💳 Payment Gateway    ⚙️  Admin Panel      │
+│  👁️  Auditor System      🔍 FMCSA API          📧 Email/SMS         │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                        SECURITY & ROLES                              │
+├──────────────────────────────────────────────────────────────────────┤
+│  🚛 Driver    📦 Shipper    ⚙️  Admin    👁️  Auditor                │
+│  JWT Authentication + Role-Based Access Control (RBAC)              │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+```typescript
 - Node.js + Express + TypeScript
 - PostgreSQL + Prisma ORM
 - JWT Authentication
-- OpenAI Vision API
+- OpenAI GPT-4 Vision API
 - FMCSA Integration
+- WebSocket (Real-time updates)
+```
 
-**Frontend:**
+### Frontend
+```typescript
 - Next.js 15 (App Router)
 - React 19
 - TypeScript
 - Tailwind CSS
 - Axios
+- React Context (State Management)
+```
+
+### AI & Integrations
+```typescript
+- OpenAI GPT-4 Vision
+- Google Maps API
+- FMCSA API (Carrier Verification)
+- Payment Gateway Integration
+```
 
 ---
 
@@ -39,150 +159,175 @@ A complete full-stack logistics platform with real-time GPS tracking, AI-powered
 ### Prerequisites
 - Node.js 18+
 - PostgreSQL 14+
-- npm or yarn
+- OpenAI API Key (para features AI)
+- FMCSA API Key (para carrier verification)
 
-### 1. Clone & Install
+### 1️⃣ Clonar e Instalar
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
+# Clonar repositorio
+git clone https://github.com/msawah/grand-eagle-logistics.git
 cd grand-eagle-logistics
 
-# Install backend dependencies
+# Instalar dependencias del backend
 cd backend
 npm install
 
-# Install frontend dependencies
+# Instalar dependencias del frontend
 cd ../frontend
 npm install
 ```
 
-### 2. Configure Environment Variables
+### 2️⃣ Configurar Variables de Entorno
 
-**Backend (.env):**
+**Backend (`backend/.env`):**
 ```env
 # Database
 DATABASE_URL="postgresql://user:password@localhost:5432/grand_eagle_db"
 
 # JWT
-JWT_SECRET="your-super-secret-jwt-key"
+JWT_SECRET="your-super-secret-jwt-key-change-this"
 JWT_EXPIRES_IN="7d"
 
 # Server
 PORT=4000
 NODE_ENV="development"
 
-# OpenAI (optional, for POD fraud detection)
-OPENAI_API_KEY="your-openai-api-key"
+# OpenAI (para AI features)
+OPENAI_API_KEY="sk-..."
 
-# FMCSA (optional, for carrier verification)
+# FMCSA (para carrier verification)
 FMCSA_API_URL="https://mobile.fmcsa.dot.gov/qc/services/carriers"
-FMCSA_API_KEY="your-fmcsa-api-key"
+FMCSA_API_KEY="your-key"
 ```
 
-**Frontend (.env.local):**
+**Frontend (`frontend/.env.local`):**
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
 ```
 
-### 3. Setup Database
+### 3️⃣ Setup Database
 
 ```bash
 cd backend
 
-# Generate Prisma Client
+# Generar Prisma Client
 npm run prisma:generate
 
-# Run migrations (creates all tables)
+# Ejecutar migraciones
 npm run prisma:migrate
 
-# (Optional) Open Prisma Studio to view database
+# (Opcional) Abrir Prisma Studio
 npm run prisma:studio
 ```
 
-### 4. Run the Application
+### 4️⃣ Ejecutar la Aplicación
 
 **Terminal 1 - Backend:**
 ```bash
 cd backend
 npm run dev
 ```
-Server will start on `http://localhost:4000`
+🚀 Backend: `http://localhost:4000`
 
 **Terminal 2 - Frontend:**
 ```bash
 cd frontend
 npm run dev
 ```
-App will open on `http://localhost:3000`
+🌐 Frontend: `http://localhost:3000`
 
 ---
 
-## 📱 Usage
+## 📱 Uso
 
-### 1. Register an Account
-- Go to `http://localhost:3000/register`
-- Choose **Shipper** or **Driver**
-- Fill in your details
+### Como Shipper
+1. Registrarse como **Shipper**
+2. Crear nuevos shipments con pickup/dropoff
+3. Asignar drivers
+4. Rastrear en tiempo real
+5. Ver POD y validación con IA
 
-### 2. As a Shipper
-- Create new shipments with pickup/dropoff locations
-- Assign drivers to shipments
-- Track shipment status in real-time
-- View POD submissions
+### Como Driver
+1. Registrarse como **Driver**
+2. Ver shipments disponibles
+3. Aceptar asignaciones
+4. Activar GPS tracking
+5. Subir POD al completar entrega
 
-### 3. As a Driver
-- View available shipments
-- Accept assigned shipments
-- Enable GPS tracking
-- Upload POD when delivery is complete
+### Como Admin
+1. Acceso total al sistema
+2. Gestionar usuarios
+3. Ver analytics
+4. Gestionar penalties
+5. Auditar transacciones
 
 ---
 
-## 🗂️ Project Structure
+## 📂 Estructura del Proyecto
 
 ```
 grand-eagle-logistics/
+│
 ├── backend/
 │   ├── prisma/
-│   │   └── schema.prisma          # Database schema
+│   │   └── schema.prisma              # Database schema
 │   ├── src/
 │   │   ├── config/
-│   │   │   ├── env.ts            # Environment config
-│   │   │   └── db.ts             # Database connection
+│   │   │   ├── env.ts                 # Environment config
+│   │   │   └── db.ts                  # Database connection
 │   │   ├── middleware/
-│   │   │   └── auth.ts           # JWT authentication
+│   │   │   └── auth.ts                # JWT middleware
 │   │   ├── routes/
-│   │   │   ├── auth.ts           # Auth endpoints
-│   │   │   ├── shipments.ts      # Shipment & POD endpoints
-│   │   │   └── drivers.ts        # Driver & carrier endpoints
+│   │   │   ├── auth.ts                # Authentication
+│   │   │   ├── shipments.ts           # Shipment management
+│   │   │   ├── drivers.ts             # Driver operations
+│   │   │   ├── wallet.ts              # Wallet & payments
+│   │   │   ├── admin.ts               # Admin operations
+│   │   │   ├── analytics.ts           # Analytics
+│   │   │   ├── notifications.ts       # Notifications
+│   │   │   └── reviews.ts             # Reviews & ratings
 │   │   ├── services/
 │   │   │   ├── authService.ts
 │   │   │   ├── shipmentService.ts
 │   │   │   ├── driverService.ts
 │   │   │   ├── podService.ts
-│   │   │   └── carrierVerificationService.ts
-│   │   ├── utils/
-│   │   │   └── aiVision.ts       # OpenAI Vision integration
-│   │   └── index.ts              # Entry point
-│   ├── package.json
-│   └── tsconfig.json
+│   │   │   ├── walletService.ts
+│   │   │   ├── analyticsService.ts
+│   │   │   ├── notificationService.ts
+│   │   │   ├── carrierVerificationService.ts
+│   │   │   ├── aiVision.ts            # OpenAI Vision
+│   │   │   ├── aiRouteOptimization.ts # Route optimization
+│   │   │   └── aiLoadAssignment.ts    # Load assignment AI
+│   │   └── index.ts
+│   └── package.json
 │
-└── frontend/
-    ├── src/
-    │   ├── app/
-    │   │   ├── page.tsx           # Landing page
-    │   │   ├── login/page.tsx
-    │   │   ├── register/page.tsx
-    │   │   └── dashboard/
-    │   │       ├── shipper/page.tsx
-    │   │       └── driver/page.tsx
-    │   ├── contexts/
-    │   │   └── AuthContext.tsx    # Auth state management
-    │   └── lib/
-    │       └── api.ts             # API client
-    ├── package.json
-    └── next.config.mjs
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── page.tsx                     # Landing page
+│   │   │   ├── login/page.tsx               # Login
+│   │   │   ├── register/page.tsx            # Register
+│   │   │   └── dashboard/
+│   │   │       ├── shipper/
+│   │   │       │   ├── page.tsx             # Shipper dashboard
+│   │   │       │   └── ultra/page.tsx       # Shipper ultra view
+│   │   │       ├── driver/
+│   │   │       │   ├── page.tsx             # Driver dashboard
+│   │   │       │   ├── ultra/page.tsx       # Driver ultra view
+│   │   │       │   └── pod/[id]/page.tsx    # POD upload
+│   │   │       └── admin/
+│   │   │           └── ultra/page.tsx       # Admin dashboard
+│   │   ├── components/
+│   │   │   └── Map.tsx                      # Real-time map
+│   │   ├── contexts/
+│   │   │   └── AuthContext.tsx              # Auth state
+│   │   └── lib/
+│   │       └── api.ts                       # API client
+│   └── package.json
+│
+├── docs/                                     # Documentación adicional
+└── README.md                                 # Este archivo
 ```
 
 ---
@@ -190,104 +335,208 @@ grand-eagle-logistics/
 ## 🔌 API Endpoints
 
 ### Authentication
-- `POST /api/v1/auth/register` - Register new user
-- `POST /api/v1/auth/login` - Login
-- `GET /api/v1/auth/profile` - Get user profile
+```
+POST   /api/v1/auth/register          - Registrar usuario
+POST   /api/v1/auth/login             - Login
+GET    /api/v1/auth/profile           - Obtener perfil
+```
 
 ### Shipments
-- `GET /api/v1/shipments` - Get all shipments (filtered by role)
-- `GET /api/v1/shipments/available` - Get available shipments (driver)
-- `GET /api/v1/shipments/:id` - Get shipment details
-- `POST /api/v1/shipments` - Create shipment (shipper)
-- `POST /api/v1/shipments/:id/assign` - Assign driver (shipper)
-- `PATCH /api/v1/shipments/:id/status` - Update status
-- `POST /api/v1/shipments/:id/pod` - Upload POD (driver)
-- `GET /api/v1/shipments/:id/pod-events` - Get POD events
+```
+GET    /api/v1/shipments              - Listar shipments
+GET    /api/v1/shipments/available    - Shipments disponibles
+GET    /api/v1/shipments/:id          - Detalle de shipment
+POST   /api/v1/shipments              - Crear shipment
+POST   /api/v1/shipments/:id/assign   - Asignar driver
+PATCH  /api/v1/shipments/:id/status   - Actualizar estado
+POST   /api/v1/shipments/:id/pod      - Subir POD
+GET    /api/v1/shipments/:id/pod-events - Eventos de POD
+```
 
 ### Drivers
-- `GET /api/v1/drivers` - Get all drivers (admin/shipper)
-- `GET /api/v1/drivers/profile` - Get driver profile
-- `POST /api/v1/drivers/location` - Update GPS location (driver)
-- `GET /api/v1/drivers/locations` - Get all driver locations
-- `POST /api/v1/drivers/:id/verify-carrier` - Verify carrier MC/DOT
+```
+GET    /api/v1/drivers                - Listar drivers
+GET    /api/v1/drivers/profile        - Perfil del driver
+POST   /api/v1/drivers/location       - Actualizar GPS
+GET    /api/v1/drivers/locations      - Ubicaciones GPS
+POST   /api/v1/drivers/:id/verify-carrier - Verificar carrier
+```
+
+### Wallet
+```
+GET    /api/v1/wallet/balance         - Balance
+POST   /api/v1/wallet/deposit         - Depositar
+POST   /api/v1/wallet/withdraw        - Retirar
+GET    /api/v1/wallet/transactions    - Historial
+```
+
+### Analytics
+```
+GET    /api/v1/analytics/dashboard    - Dashboard metrics
+GET    /api/v1/analytics/revenue      - Revenue analytics
+GET    /api/v1/analytics/performance  - Performance metrics
+```
+
+### Notifications
+```
+GET    /api/v1/notifications          - Listar notificaciones
+PATCH  /api/v1/notifications/:id/read - Marcar como leída
+POST   /api/v1/notifications/send     - Enviar notificación
+```
 
 ---
 
 ## 🚢 Deployment
 
-### Deploy to Railway
+### Deploy a Render.com
 
-1. Create account at [railway.app](https://railway.app)
-2. Create new project
-3. Add PostgreSQL database
-4. Deploy backend:
-   - Connect GitHub repo
-   - Set environment variables
-   - Build command: `cd backend && npm install && npm run prisma:generate && npm run build`
-   - Start command: `cd backend && npm run prisma:deploy && npm start`
-5. Deploy frontend:
-   - Connect GitHub repo
-   - Set `NEXT_PUBLIC_API_URL` to backend URL
-   - Auto-deploys
+#### Backend
+```bash
+Root Directory: backend
+Build Command: npm install && npm run prisma:generate && npm run build
+Start Command: npm run prisma:deploy && npm start
+```
 
-### Deploy to Render
+#### Frontend
+```bash
+Root Directory: frontend
+Build Command: npm install && npm run build
+Start Command: npm start
+```
 
-1. Create account at [render.com](https://render.com)
-2. Create PostgreSQL database
-3. Create Web Service for backend:
-   - Root directory: `backend`
-   - Build: `npm install && npm run prisma:generate && npm run build`
-   - Start: `npm run prisma:deploy && npm start`
-4. Create Web Service for frontend:
-   - Root directory: `frontend`
-   - Build: `npm install && npm run build`
-   - Start: `npm start`
+#### Database
+- PostgreSQL 14+
+- Configurar `DATABASE_URL` en las variables de entorno
+
+### Variables de Entorno en Render
+
+**Backend:**
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `OPENAI_API_KEY`
+- `FMCSA_API_KEY`
+- `NODE_ENV=production`
+
+**Frontend:**
+- `NEXT_PUBLIC_API_URL` (URL del backend en Render)
 
 ---
 
 ## 🔐 Security Features
 
-- ✅ Password hashing with bcrypt
-- ✅ JWT token authentication
-- ✅ Role-based access control
-- ✅ GPS location validation for POD
-- ✅ AI fraud detection for POD photos
-- ✅ Carrier verification via FMCSA
+- ✅ **Password Hashing** - bcrypt
+- ✅ **JWT Authentication** - Tokens seguros
+- ✅ **Role-Based Access Control** - RBAC
+- ✅ **GPS Validation** - Validación de ubicación POD
+- ✅ **AI Fraud Detection** - Detección con OpenAI Vision
+- ✅ **Carrier Verification** - Verificación FMCSA
+- ✅ **Data Encryption** - Encriptación de datos sensibles
+- ✅ **Audit Logging** - Registro de eventos
+
+---
+
+## 📊 Features Roadmap
+
+### ✅ Implementado
+- [x] Authentication & Authorization
+- [x] Shipment Management
+- [x] Real-time GPS Tracking
+- [x] POD with AI Fraud Detection
+- [x] Carrier Verification
+- [x] Wallet System
+- [x] Analytics Dashboard
+- [x] Notifications
+- [x] AI Route Optimization
+- [x] AI Load Assignment
+
+### 🚧 En Desarrollo
+- [ ] Mobile Apps (React Native)
+- [ ] SMS Notifications (Twilio)
+- [ ] Email Notifications
+- [ ] Cloud Storage (AWS S3)
+- [ ] Advanced Analytics
+- [ ] Multi-language Support
+
+---
+
+## 📚 Documentación Adicional
+
+- [📋 Commands](./docs/COMMANDS.md) - Lista de comandos útiles
+- [🚀 Deployment Guide](./docs/DEPLOYMENT.md) - Guía completa de deployment
+- [⚙️ Environment Setup](./docs/ENVIRONMENT_SETUP.md) - Configuración detallada
+- [🏗️ Platform Guide](./docs/PLATFORM_GUIDE.md) - Guía de la plataforma
+- [📖 Quick Start](./docs/QUICK_START.md) - Guía rápida de inicio
 
 ---
 
 ## 🤝 Contributing
 
-This is a complete production-ready logistics platform. Feel free to customize for your specific needs!
+Este proyecto es activamente mantenido. Para contribuir:
+
+1. Fork el proyecto
+2. Crea una rama (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
 ---
 
 ## 📄 License
 
-MIT License - Feel free to use for commercial or personal projects
+MIT License - Ver [LICENSE](LICENSE) para más detalles
 
 ---
 
-## 🆘 Support
+## 🆘 Support & Help
 
-For issues or questions, please check:
-1. Backend logs: Check console output
-2. Database: Use `npm run prisma:studio`
-3. API health: `GET /api/v1/health`
+### Troubleshooting
+
+**Backend no inicia:**
+- Verificar `DATABASE_URL` en `.env`
+- Ejecutar `npm run prisma:migrate`
+- Verificar logs en consola
+
+**Frontend no conecta:**
+- Verificar `NEXT_PUBLIC_API_URL` en `.env.local`
+- Verificar que backend esté corriendo
+- Revisar CORS settings
+
+**AI Features no funcionan:**
+- Verificar `OPENAI_API_KEY` válido
+- Revisar límites de uso de OpenAI
+- Verificar logs del backend
+
+### Tools de Debugging
+```bash
+# Ver database con Prisma Studio
+cd backend && npm run prisma:studio
+
+# Health check del API
+curl http://localhost:4000/api/v1/health
+
+# Logs del backend
+cd backend && npm run dev
+
+# Logs del frontend
+cd frontend && npm run dev
+```
 
 ---
 
-## 🎯 Next Steps
+## 👥 Team
 
-1. **Add OpenAI API Key** - Enable real AI fraud detection
-2. **Add FMCSA API Key** - Enable real carrier verification
-3. **Configure Cloud Storage** - For POD image uploads (AWS S3, Cloudinary)
-4. **Add Email Notifications** - Notify users of shipment updates
-5. **Add SMS Notifications** - Real-time alerts via Twilio
-6. **Add Mobile Apps** - React Native for iOS/Android
+**Desarrollado por:** Grand Eagle Logistics Team
+
+**Contacto:** [Crear un issue](https://github.com/msawah/grand-eagle-logistics/issues)
 
 ---
 
-**Built with ❤️ for Grand Eagle Logistics**
+<div align="center">
 
-🦅 **Soar High, Deliver Fast!**
+### 🦅 **Soar High, Deliver Fast!**
+
+**Built with ❤️ using TypeScript, Next.js, PostgreSQL & OpenAI**
+
+[⬆ Volver arriba](#-grand-eagle-logistics)
+
+</div>
